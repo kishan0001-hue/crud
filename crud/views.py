@@ -14,6 +14,6 @@ def blog_create (request):
     if Value.is_valid():
         Value.save()
         return Response( Value.data , status= status.HTTP_200_OK)
-    return Response(Value.error , status=status.HTTP_400_BAD_REQUEST)
+    return Response(Value.errors , status=status.HTTP_400_BAD_REQUEST)
 
 
