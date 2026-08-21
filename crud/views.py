@@ -11,7 +11,7 @@ from .serializer import blogserializer
 def blog_create (request):
 
     Value = blogserializer( data = request.data)
-    if Value.is_valid:
+    if Value.is_valid():
         Value.save()
         return Response( Value.data , status= status.HTTP_200_OK)
     return Response(Value.error , status=status.HTTP_400_BAD_REQUEST)
