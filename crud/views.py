@@ -1,8 +1,8 @@
 
-from .serializer import blogSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
+from .serializer import blogserializer
 
 
 # Create your views here.
@@ -10,7 +10,7 @@ from rest_framework import status
 @api_view (['POST'])
 def blog_create (request):
 
-    Value = blogSerializer( data = request.data)
+    Value = blogserializer( data = request.data)
     if Value.is_valid:
         Value.save()
         return Response( Value.data , status= status.HTTP_200_OK)
