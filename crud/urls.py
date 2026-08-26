@@ -9,5 +9,6 @@ urlpatterns = [
     path('show/', views.blog_show , name='show_blog'),
     path('registration/' , views.registration , name='register'),
     path('login/' , views.login , name = 'login_blog'),
-    path('token/refresh/' , views.referesh_token , name = 'token_refresh' )
+    path('token/refresh/' , views.referesh_token , name = 'token_refresh' ),
+    path('verify-otp/', views.verify_otp , name= 'verify_otp')
 ]
