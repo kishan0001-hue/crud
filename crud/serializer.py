@@ -1,26 +1,56 @@
-from turtle import st
-
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken , TokenError
 from rest_framework import status
-from rest_framework.response import Response
 from .models import blog
 
 class blogserializer(serializers.ModelSerializer):
     class Meta:
         model = blog
-        fields = '__all__' 
+        fields = [
+            'id',
+            'author',
+            'name',
+            'topic',
+            'discription',
+            'created_at',
+            'updated_at',
+        ]
+
+        read_only_field = [
+            'id',
+            'author',
+            'created_at',
+            'updatde_at',
+        ]
 
 class Registerationserializer(serializers.ModelSerializer):
+
+    password = serializers.CharField(
+        write_only = True
+    )
+
     class Meta:
         model= User
-        fields = '__all__'
+        fields = [
+            'username',
+            'email',
+            'password',
+        ]
+
+    def create(self, validated_data):
+        user =  User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email',''),
+            password=validated_data['password']
+        )
+
+        return user
 
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
-    password = serializers.CharField()
+    password = serializers.CharField(write_only = True)
 
 class refreshserialier(serializers.Serializer):
     refresh = serializers.CharField()
