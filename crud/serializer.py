@@ -13,6 +13,7 @@ class blogserializer(serializers.ModelSerializer):
             'name',
             'topic',
             'discription',
+            'image',
             'created_at',
             'updated_at',
         ]

@@ -29,6 +29,21 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+LANGUAGE_CODE = "en-us"
+
+USE_I18N = True
+
+LANGUAGES = [
+    ("en", "English"),
+    ("hi", "Hindi"),
+    ("gu", "Gujarati"),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / "locale",
+]
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,11 +56,13 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework',
     'rest_framework_simplejwt',
+    'corsheaders',
     'crud',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -171,3 +188,20 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_TIME' : timedelta(minutes=5),
     'REFRESH_TOKEN_TIME' : timedelta(hours=2),
 }
+
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "Asia/Kolkata"
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

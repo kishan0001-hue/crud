@@ -1,5 +1,6 @@
 import random
 
+from django.utils.translation import gettext as _
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
@@ -13,6 +14,7 @@ from rest_framework.permissions import IsAuthenticated , AllowAny
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken , TokenError
 
+from .task import send_otp_email
 from datetime import timedelta
 from .pagination import BlogPagination
 from .filter import BlogFilter
@@ -52,25 +54,17 @@ def registration (request):
         defaults={'otp': otp,'is_verified': False}
     )
 
-    send_mail(
-
-        subject='Email Verification OTP',
-        message=f'''Hello {user.username},
-        Your OTP is:{otp}
-        This OTP will expire in 5 minutes.
-        Please do not share this OTP with anyone.''',
-
-        from_email=settings.DEFAULT_FROM_EMAIL,
-
-        recipient_list=[user.email],
-        fail_silently=False
+    send_otp_email.delay(
+    user.username,
+    user.email,
+    otp
     )
 
     return Response(
         {
             'message':
-            'Registration successful. '
-            'OTP has been sent to your email.'
+            _('Registration successful. '
+            'OTP has been sent to your email.')
         },
 
         status=status.HTTP_201_CREATED
@@ -115,11 +109,11 @@ def login(request):
     user = authenticate(username=username,password=password)
     if user is None:
         return Response({
-            "error":"Invalid username and password"
+            "error":_("Invalid username and password")
         },status=status.HTTP_401_UNAUTHORIZED
         )
     refresh_token = RefreshToken.for_user(user=user)
-    return Response({"message" : "user login successfull",
+    return Response({"message" : _("user login successfull"),
                      "username": user.username,
                      "is_superuser":user.is_superuser,
                      "access_token":f"{refresh_token.access_token}","refresh_token":f"{refresh_token}"})
@@ -170,7 +164,7 @@ def referesh_token(request):
         )
     return Response(
         {
-            "ERROR":"refresh token is invalid"
+            "ERROR":_("refresh token is invalid")
         },
         status=status.HTTP_400_BAD_REQUEST
     )
@@ -196,7 +190,7 @@ def blog_update (request , name):
 
     except blog.DoesNotExist:
         return Response( {
-            "message" : "blog does not exist"
+            "message" : _("blog does not exist")
         } , status=status.HTTP_400_BAD_REQUEST)
 
     if (
@@ -204,7 +198,7 @@ def blog_update (request , name):
         and blog_object.author != request.user
     ):
         return Response({
-            "message":"you can only update your blog"
+            "message":_("you can only update your blog")
         },status=status.HTTP_403_FORBIDDEN
         )
 
@@ -223,14 +217,14 @@ def blog_delete (request , name ):
         blog_object = blog.objects.get(name= name)
 
     except blog.DoesNotExist:
-        return Response({"error : the blog not exist"} , status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error" : _("the blog not exist")} , status=status.HTTP_400_BAD_REQUEST)
 
     if(
         not request.user.is_superuser
         and blog_object.author != request.user 
     ):
         return Response({
-            "message":"you can only delete your blog"
+            "message":_("you can only delete your blog")
         },status=status.HTTP_403_FORBIDDEN
         )
 
@@ -307,7 +301,7 @@ def verify_otp(request):
 
         return Response(
             {
-                'error': 'User not found'
+                'error': _('User not found')
             },
             status=status.HTTP_404_NOT_FOUND
         )
@@ -322,7 +316,7 @@ def verify_otp(request):
 
         return Response(
             {
-                'error': 'OTP not found'
+                'error': _('OTP not found')
             },
 
             status=status.HTTP_400_BAD_REQUEST
@@ -337,7 +331,7 @@ def verify_otp(request):
         return Response(
             {
                 'message':
-                'Email is already verified'
+                _('Email is already verified')
             },
 
             status=status.HTTP_200_OK
@@ -353,12 +347,13 @@ def verify_otp(request):
     )
 
     if timezone.now() > expiry_time:
+        otp_record.delete()
 
         return Response(
             {
                 'error':
-                'OTP has expired. '
-                'Please request a new OTP.'
+                _('OTP has expired. '
+                'Please request a new OTP.')
             },
 
             status=status.HTTP_400_BAD_REQUEST
@@ -372,7 +367,7 @@ def verify_otp(request):
 
         return Response(
             {
-                'error': 'Invalid OTP'
+                'error': _('Invalid OTP')
             },
 
             status=status.HTTP_400_BAD_REQUEST
@@ -391,7 +386,7 @@ def verify_otp(request):
     return Response(
         {
             'message':
-            'Email verified successfully'
+            _('Email verified successfully')
         },
 
         status=status.HTTP_200_OK

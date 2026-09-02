@@ -10,6 +10,7 @@ class blog(models.Model):
     name = models.CharField(max_length=50)
     topic = models.CharField(max_length=50 , unique=True)
     discription = models.TextField()
+    image = models.ImageField(upload_to='blog_images/',blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now= True)
 

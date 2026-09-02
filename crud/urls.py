@@ -1,6 +1,8 @@
 
+from django.contrib import messages
 from django.urls import path 
 from crud import views
+from . import views
 
 urlpatterns = [
     path('create/', views.blog_create , name= 'create_blog' ),
@@ -10,5 +12,7 @@ urlpatterns = [
     path('registration/' , views.registration , name='register'),
     path('login/' , views.login , name = 'login_blog'),
     path('token/refresh/' , views.referesh_token , name = 'token_refresh' ),
-    path('verify-otp/', views.verify_otp , name= 'verify_otp')
+    path('verify-otp/', views.verify_otp , name= 'verify_otp'),
+    path('images/', views.images ),
+    path('messages/', views.messages)
 ]
